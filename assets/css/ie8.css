@@ -66,18 +66,18 @@
 
 /* One */
 
-	#one {
+	#skills {
 		-ms-behavior: url("assets/js/ie/backgroundsize.min.htc");
 		background: url("../../images/one.jpg");
 		background-size: cover;
 	}
 
-		#one .content {
+		#skills .content {
 			position: relative;
 			z-index: 1;
 		}
 
-		#one.left:before, #one.right:after {
+		#skills.left:before, #skills.right:after {
 			content: '';
 			background: url("images/overlay.png");
 			width: 100%;
@@ -89,18 +89,18 @@
 
 /* Two */
 
-	#two {
+	#who-i-am {
 		-ms-behavior: url("assets/js/ie/backgroundsize.min.htc");
 		background: url("../../images/two.jpg");
 		background-size: cover;
 	}
 
-		#two .content {
+		#who-i-am .content {
 			position: relative;
 			z-index: 1;
 		}
 
-		#two.left:before, #two.right:after {
+		#who-i-am.left:before, #who-i-am.right:after {
 			content: '';
 			background: url("images/overlay.png");
 			width: 100%;
