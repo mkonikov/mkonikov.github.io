@@ -487,6 +487,7 @@
 		/*line-height: 1.4;*/
 	}
 
+
 		@media screen and (max-width: 1920px) {
 
 			body, input, textarea, select {
@@ -496,6 +497,7 @@
 			#intro p {
 				font-size: 20pt;
 			}
+
 
 			#bio p {
 				/*font-size: 15pt;*/
@@ -2189,10 +2191,16 @@
 		margin-right: 10px;
 	}
 	#bio {
-		display: flex;
+		display: block;
 	}
 	#bio div {
 		flex: 1.7;
+	}
+
+	@media screen and (min-width: 1110px) {
+		#bio {
+			display: flex;
+		}
 	}
 
 	#bio #headshot {
