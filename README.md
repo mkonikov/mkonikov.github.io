@@ -1,4 +1,4 @@
-# Hey!
+# Hey! 👋
 
 You should check out my site [here](http://mkonikov.com).
 
