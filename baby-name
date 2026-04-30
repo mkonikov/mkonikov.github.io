@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Konikov Name Market — Kalshi</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0e14;
+      --surface: #141720;
+      --surface-2: #1a1e2c;
+      --surface-3: #1f2433;
+      --border: #242a3a;
+      --border-light: #2d3547;
+      --text: #dce4f0;
+      --text-muted: #5a6785;
+      --text-dim: #7b8caa;
+      --green: #00c07a;
+      --green-dim: rgba(0, 192, 122, 0.12);
+      --red: #f04f4f;
+      --red-dim: rgba(240, 79, 79, 0.12);
+      --blue: #4f87f5;
+      --violet: #9b87f5;
+      --amber: #f59e3a;
+      --emerald: #34d399;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 52px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar-left { display: flex; align-items: center; gap: 24px; }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 13px;
+    }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb .sep { color: var(--border-light); }
+    .breadcrumb .current { color: var(--text-dim); }
+    .navbar-right { display: flex; align-items: center; gap: 12px; }
+    .btn-ghost {
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 6px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; transition: all 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--border-light); color: var(--text); }
+    .btn-primary {
+      padding: 6px 16px;
+      background: var(--green); border: none;
+      color: #000; border-radius: 6px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600; transition: all 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* PAGE */
+    .page { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+    /* MARKET HEADER */
+    .market-header {
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .market-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .tag {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+      background: rgba(79, 135, 245, 0.12);
+      color: var(--blue);
+      border: 1px solid rgba(79, 135, 245, 0.2);
+    }
+    .tag-new {
+      background: rgba(0, 192, 122, 0.1);
+      color: var(--green);
+      border-color: rgba(0, 192, 122, 0.2);
+    }
+    .market-title {
+      font-size: 22px; font-weight: 600;
+      color: var(--text); margin-bottom: 10px; letter-spacing: -0.3px;
+    }
+    .market-resolve { font-size: 13px; color: var(--text-muted); }
+    .market-resolve span { color: var(--text-dim); }
+    .market-header-row {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 16px;
+    }
+    .market-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .icon-btn {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; color: var(--text-muted); transition: all 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--border-light); color: var(--text); }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex; gap: 32px;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
+    }
+    .stat-item { display: flex; flex-direction: column; gap: 2px; }
+    .stat-label {
+      font-size: 11px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);
+    }
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px; font-weight: 500; color: var(--text);
+    }
+    .stat-value.green { color: var(--green); }
+
+    /* TABS */
+    .tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--border); margin-top: 4px;
+    }
+    .tab {
+      padding: 12px 18px; font-size: 13px; font-weight: 500;
+      color: var(--text-muted); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: all 0.15s; user-select: none;
+    }
+    .tab:hover { color: var(--text-dim); }
+    .tab.active { color: var(--text); border-bottom-color: var(--green); }
+
+    /* MAIN LAYOUT */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px; padding: 20px 0;
+    }
+
+    /* CHART SECTION */
+    .chart-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+    }
+    .chart-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .chart-title { font-size: 13px; font-weight: 500; color: var(--text-dim); }
+    .time-range {
+      display: flex; gap: 2px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 2px;
+    }
+    .time-btn {
+      padding: 4px 10px; font-size: 12px;
+      font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      color: var(--text-muted); cursor: pointer;
+      border-radius: 4px; transition: all 0.15s; user-select: none;
+    }
+    .time-btn.active {
+      background: var(--surface-3); color: var(--text);
+      border: 1px solid var(--border-light);
+    }
+    .chart-legend {
+      display: flex; flex-wrap: wrap;
+      gap: 16px; margin-bottom: 12px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .legend-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+    .chart-container { position: relative; height: 300px; }
+
+    /* ORDER PANEL */
+    .order-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      position: sticky; top: 72px; height: fit-content;
+    }
+    .order-panel-empty { padding: 40px 20px; text-align: center; }
+    .order-panel-empty-icon { font-size: 32px; margin-bottom: 12px; }
+    .order-panel-empty-text { color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+    .order-panel-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .order-panel-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .order-panel-close {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted);
+      border-radius: 4px; transition: all 0.15s;
+    }
+    .order-panel-close:hover { background: var(--surface-2); color: var(--text); }
+    .order-panel-body {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .order-type-toggle {
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 3px; gap: 3px;
+    }
+    .order-type-btn {
+      padding: 8px; text-align: center;
+      border-radius: 5px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .order-type-btn.yes-active {
+      background: var(--green-dim); color: var(--green);
+      border: 1px solid rgba(0, 192, 122, 0.25);
+    }
+    .order-type-btn.no-active {
+      background: var(--red-dim); color: var(--red);
+      border: 1px solid rgba(240, 79, 79, 0.25);
+    }
+    .order-type-btn.inactive { color: var(--text-muted); }
+    .order-type-btn.inactive:hover { color: var(--text-dim); }
+    .order-price-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+    }
+    .order-price-label { font-size: 12px; color: var(--text-muted); }
+    .order-price-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px; font-weight: 600;
+    }
+    .order-price-value.yes { color: var(--green); }
+    .order-price-value.no { color: var(--red); }
+    .field-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .qty-input {
+      display: flex; align-items: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+    .qty-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted);
+      background: var(--surface-3); font-size: 18px;
+      user-select: none; transition: all 0.1s;
+    }
+    .qty-btn:hover { color: var(--text); background: var(--border); }
+    .qty-number {
+      flex: 1; text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px; font-weight: 500; color: var(--text);
+      background: transparent; border: none; outline: none;
+    }
+    .payout-rows {
+      background: var(--surface-2);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    }
+    .payout-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 14px; border-bottom: 1px solid var(--border);
+    }
+    .payout-row:last-child { border-bottom: none; }
+    .payout-label { font-size: 12px; color: var(--text-muted); }
+    .payout-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 500; color: var(--text);
+    }
+    .payout-value.profit { color: var(--green); }
+    .btn-place-order {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-place-yes { background: var(--green); color: #000; }
+    .btn-place-yes:hover { opacity: 0.88; }
+    .btn-place-no { background: var(--red); color: #fff; }
+    .btn-place-no:hover { opacity: 0.88; }
+    .order-disclaimer {
+      font-size: 11px; color: var(--text-muted);
+      text-align: center; line-height: 1.5;
+    }
+
+    /* CONTRACTS SECTION */
+    .contracts-section { margin-bottom: 32px; }
+    .contracts-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .contracts-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .contracts-count {
+      font-size: 12px; color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 2px 8px;
+    }
+    .contracts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .contract-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+      transition: border-color 0.15s; cursor: default;
+    }
+    .contract-card:hover { border-color: var(--border-light); }
+    .contract-card.selected {
+      border-color: var(--border-light);
+      box-shadow: 0 0 0 1px var(--border-light);
+    }
+    .contract-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 10px;
+    }
+    .contract-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .contract-prob {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px; font-weight: 600; color: var(--text);
+    }
+    .contract-prob-label { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 1px; }
+    .prob-bar-track {
+      height: 3px; background: var(--surface-3);
+      border-radius: 2px; margin-bottom: 12px; overflow: hidden;
+    }
+    .prob-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+    .contract-card-mid {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .price-info { display: flex; gap: 12px; }
+    .price-item { display: flex; flex-direction: column; gap: 1px; }
+    .price-tag {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.3px; text-transform: uppercase;
+    }
+    .price-tag.yes { color: var(--green); }
+    .price-tag.no { color: var(--red); }
+    .price-cents {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px; font-weight: 600; color: var(--text);
+    }
+    .sparkline-container { width: 80px; height: 36px; flex-shrink: 0; }
+    .contract-card-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .contract-volume { font-size: 11px; color: var(--text-muted); }
+    .contract-volume span { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); }
+    .buy-btns { display: flex; gap: 6px; }
+    .buy-btn {
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+    .buy-yes {
+      background: var(--green-dim); color: var(--green);
+      border: 1px solid rgba(0, 192, 122, 0.2) !important;
+    }
+    .buy-yes:hover { background: rgba(0, 192, 122, 0.2); }
+    .buy-no {
+      background: var(--red-dim); color: var(--red);
+      border: 1px solid rgba(240, 79, 79, 0.2) !important;
+    }
+    .buy-no:hover { background: rgba(240, 79, 79, 0.2); }
+
+    /* ORDERBOOK */
+    .orderbook-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .ob-header {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .ob-header-cell {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);
+    }
+    .ob-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    }
+    .ob-row:last-child { border-bottom: none; }
+    .ob-row.bid { background: rgba(0, 192, 122, 0.03); }
+    .ob-row.ask { background: rgba(240, 79, 79, 0.03); }
+    .ob-cell { color: var(--text-dim); }
+    .ob-cell.bid-price { color: var(--green); }
+    .ob-cell.ask-price { color: var(--red); }
+
+    /* ACTIVITY */
+    .activity-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .activity-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .activity-row:last-child { border-bottom: none; }
+    .activity-badge {
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+    }
+    .activity-badge.yes { background: var(--green-dim); color: var(--green); }
+    .activity-badge.no { background: var(--red-dim); color: var(--red); }
+    .activity-name { font-size: 13px; color: var(--text); flex: 1; }
+    .activity-amount {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-dim);
+    }
+    .activity-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 10px; padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 1000; max-width: 380px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { font-size: 20px; }
+    .toast-text { font-size: 13px; color: var(--text); }
+    .toast-text strong { color: var(--green); }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .order-panel {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        border-radius: 16px 16px 0 0;
+        z-index: 200;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+      }
+      .order-panel.mobile-open { transform: translateY(0); }
+      .contracts-grid { grid-template-columns: 1fr; }
+      .stats-bar { flex-wrap: wrap; gap: 16px; }
+      .breadcrumb { display: none; }
+      .market-title { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      Kalshi
+    </div>
+    <div class="breadcrumb">
+      <a href="#">Markets</a>
+      <span class="sep">›</span>
+      <a href="#">Culture</a>
+      <span class="sep">›</span>
+      <span class="current">Konikov Baby Name</span>
+    </div>
+  </div>
+  <div class="navbar-right">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-primary">Sign up</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="market-header">
+    <div class="market-header-row">
+      <div>
+        <div class="market-meta">
+          <span class="tag">Culture</span>
+          <span class="tag tag-new">🍼 Born Apr 17</span>
+        </div>
+        <h1 class="market-title">What will baby Konikov be named?</h1>
+        <div class="market-resolve">
+          Resolves <span>when named</span> · Opened <span>Apr 17, 2026</span> · <span>4 contracts</span>
+        </div>
+      </div>
+      <div class="market-actions">
+        <div class="icon-btn" title="Bookmark">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="icon-btn" title="Share">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">Total Volume</div>
+      <div class="stat-value">$12,847</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Open Interest</div>
+      <div class="stat-value">$3,219</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Traders</div>
+      <div class="stat-value">284</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Time Open</div>
+      <div class="stat-value green">12 days</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Resolves</div>
+      <div class="stat-value">When named</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="charts">Charts</div>
+    <div class="tab" data-tab="orderbook">Orderbook</div>
+    <div class="tab" data-tab="activity">Activity</div>
+    <div class="tab" data-tab="rules">Rules</div>
+  </div>
+
+  <!-- CHARTS TAB -->
+  <div id="tab-charts">
+    <div class="main-layout">
+      <div>
+        <div class="chart-section">
+          <div class="chart-header">
+            <div class="chart-title">Contract Probabilities</div>
+            <div class="time-range">
+              <div class="time-btn active">ALL</div>
+              <div class="time-btn">1W</div>
+              <div class="time-btn">3D</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#4f87f5"></div>
+              <span>Shmuel</span>
+              <span class="legend-pct">34%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#9b87f5"></div>
+              <span>Jeremiah</span>
+              <span class="legend-pct">28%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f59e3a"></div>
+              <span>Ezekiel</span>
+              <span class="legend-pct">26%</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#34d399"></div>
+              <span>Zurishaddai</span>
+              <span class="legend-pct">12%</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
+
+        <div class="contracts-section" style="margin-top: 16px;">
+          <div class="contracts-header">
+            <div class="contracts-title">Contracts</div>
+            <div class="contracts-count">4 outcomes</div>
+          </div>
+          <div class="contracts-grid" id="contractsGrid"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="order-panel" id="orderPanel">
+          <div class="order-panel-empty" id="orderPanelEmpty">
+            <div class="order-panel-empty-icon">📊</div>
+            <div class="order-panel-empty-text">
+              Select <strong style="color:var(--text)">Buy YES</strong> or <strong style="color:var(--text)">Buy NO</strong><br>on any contract to place an order.
+            </div>
+          </div>
+          <div id="orderPanelForm" class="hidden">
+            <div class="order-panel-header">
+              <div>
+                <div class="order-panel-title" id="orderContractName">Shmuel</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Baby Konikov Name Market</div>
+              </div>
+              <div class="order-panel-close" id="orderClose">✕</div>
+            </div>
+            <div class="order-panel-body">
+              <div>
+                <div class="field-label">Direction</div>
+                <div class="order-type-toggle">
+                  <div class="order-type-btn yes-active" id="orderYesBtn" onclick="setDirection('yes')">Buy YES</div>
+                  <div class="order-type-btn inactive" id="orderNoBtn" onclick="setDirection('no')">Buy NO</div>
+                </div>
+              </div>
+              <div class="order-price-row">
+                <div>
+                  <div class="order-price-label">Current price</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Ask (best offer)</div>
+                </div>
+                <div class="order-price-value yes" id="orderCurrentPrice">34¢</div>
+              </div>
+              <div>
+                <div class="field-label">Quantity (shares)</div>
+                <div class="qty-input">
+                  <div class="qty-btn" onclick="changeQty(-10)">−</div>
+                  <input class="qty-number" id="qtyInput" type="number" value="100" min="1" max="10000" oninput="updatePayout()">
+                  <div class="qty-btn" onclick="changeQty(10)">+</div>
+                </div>
+              </div>
+              <div class="payout-rows">
+                <div class="payout-row">
+                  <div class="payout-label">Cost</div>
+                  <div class="payout-value" id="orderCost">$34.00</div>
+                </div>
+                <div class="payout-row">
+                  <div class="payout-label">Max payout</div>
+                  <div class="payout-value" id="orderPayout">$100.00</div>
+                </div>
+                <div class="payout-row">
+                  <div class="payout-label">Max profit</div>
+                  <div class="payout-value profit" id="orderProfit">+$66.00</div>
+                </div>
+                <div class="payout-row">
+                  <div class="payout-label">Return if correct</div>
+                  <div class="payout-value profit" id="orderReturn">+194%</div>
+                </div>
+              </div>
+              <button class="btn-place-order btn-place-yes" id="placeOrderBtn" onclick="placeOrder()">
+                Place Order
+              </button>
+              <div class="order-disclaimer">
+                By placing this order you agree to Kalshi's terms. Orders may not fill at exact price.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERBOOK TAB -->
+  <div id="tab-orderbook" class="hidden">
+    <div style="padding:20px 0;">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+
+        <div class="orderbook-table">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;">
+            Shmuel · <span style="color:var(--blue);">34¢ YES</span>
+          </div>
+          <div class="ob-header">
+            <div class="ob-header-cell">Side</div><div class="ob-header-cell">Price</div>
+            <div class="ob-header-cell">Qty</div><div class="ob-header-cell">Total</div>
+          </div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">36¢</div><div class="ob-cell">240</div><div class="ob-cell">$86.40</div></div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">35¢</div><div class="ob-cell">180</div><div class="ob-cell">$63.00</div></div>
+          <div style="padding:6px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-muted);font-family:monospace;font-weight:600;text-align:center;">— SPREAD: 1¢ —</div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">34¢</div><div class="ob-cell">320</div><div class="ob-cell">$108.80</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">33¢</div><div class="ob-cell">210</div><div class="ob-cell">$69.30</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">32¢</div><div class="ob-cell">150</div><div class="ob-cell">$48.00</div></div>
+        </div>
+
+        <div class="orderbook-table">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;">
+            Jeremiah · <span style="color:var(--violet);">28¢ YES</span>
+          </div>
+          <div class="ob-header">
+            <div class="ob-header-cell">Side</div><div class="ob-header-cell">Price</div>
+            <div class="ob-header-cell">Qty</div><div class="ob-header-cell">Total</div>
+          </div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">30¢</div><div class="ob-cell">190</div><div class="ob-cell">$57.00</div></div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">29¢</div><div class="ob-cell">145</div><div class="ob-cell">$42.05</div></div>
+          <div style="padding:6px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-muted);font-family:monospace;font-weight:600;text-align:center;">— SPREAD: 1¢ —</div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">28¢</div><div class="ob-cell">260</div><div class="ob-cell">$72.80</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">27¢</div><div class="ob-cell">180</div><div class="ob-cell">$48.60</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">26¢</div><div class="ob-cell">120</div><div class="ob-cell">$31.20</div></div>
+        </div>
+
+        <div class="orderbook-table">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;">
+            Ezekiel · <span style="color:var(--amber);">26¢ YES</span>
+          </div>
+          <div class="ob-header">
+            <div class="ob-header-cell">Side</div><div class="ob-header-cell">Price</div>
+            <div class="ob-header-cell">Qty</div><div class="ob-header-cell">Total</div>
+          </div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">28¢</div><div class="ob-cell">170</div><div class="ob-cell">$47.60</div></div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">27¢</div><div class="ob-cell">130</div><div class="ob-cell">$35.10</div></div>
+          <div style="padding:6px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-muted);font-family:monospace;font-weight:600;text-align:center;">— SPREAD: 1¢ —</div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">26¢</div><div class="ob-cell">220</div><div class="ob-cell">$57.20</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">25¢</div><div class="ob-cell">160</div><div class="ob-cell">$40.00</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">24¢</div><div class="ob-cell">100</div><div class="ob-cell">$24.00</div></div>
+        </div>
+
+        <div class="orderbook-table">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;">
+            Zurishaddai · <span style="color:var(--emerald);">12¢ YES</span>
+          </div>
+          <div class="ob-header">
+            <div class="ob-header-cell">Side</div><div class="ob-header-cell">Price</div>
+            <div class="ob-header-cell">Qty</div><div class="ob-header-cell">Total</div>
+          </div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">14¢</div><div class="ob-cell">300</div><div class="ob-cell">$42.00</div></div>
+          <div class="ob-row ask"><div class="ob-cell">ASK</div><div class="ob-cell ask-price">13¢</div><div class="ob-cell">250</div><div class="ob-cell">$32.50</div></div>
+          <div style="padding:6px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;color:var(--text-muted);font-family:monospace;font-weight:600;text-align:center;">— SPREAD: 1¢ —</div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">12¢</div><div class="ob-cell">180</div><div class="ob-cell">$21.60</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">11¢</div><div class="ob-cell">140</div><div class="ob-cell">$15.40</div></div>
+          <div class="ob-row bid"><div class="ob-cell">BID</div><div class="ob-cell bid-price">10¢</div><div class="ob-cell">90</div><div class="ob-cell">$9.00</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY TAB -->
+  <div id="tab-activity" class="hidden">
+    <div style="padding:20px 0;">
+      <div class="activity-list" id="activityList"></div>
+    </div>
+  </div>
+
+  <!-- RULES TAB -->
+  <div id="tab-rules" class="hidden">
+    <div style="padding:24px 0;max-width:680px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">Resolution Rules</h3>
+        <p style="color:var(--text-dim);line-height:1.7;font-size:14px;margin-bottom:16px;">
+          This market resolves to the contract whose name matches the official given name announced for baby Konikov. The market creator (or designated resolver) will confirm resolution upon public announcement.
+        </p>
+        <h4 style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">Resolution Criteria</h4>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;font-size:13px;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span>
+            <span>YES resolves to 100¢ for the correct name contract; all others resolve to 0¢</span>
+          </li>
+          <li style="display:flex;gap:10px;font-size:13px;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span>
+            <span>If none of the listed names are chosen, all contracts resolve to 0¢ (N/A resolution)</span>
+          </li>
+          <li style="display:flex;gap:10px;font-size:13px;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span>
+            <span>Market opened April 17, 2026 — the day baby Konikov was born</span>
+          </li>
+          <li style="display:flex;gap:10px;font-size:13px;color:var(--text-dim);">
+            <span style="color:var(--green);">✓</span>
+            <span>Mazel tov to the Konikov family! 🎉</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-icon">✅</div>
+  <div class="toast-text" id="toastText">Order placed successfully!</div>
+</div>
+
+<script>
+const contracts = [
+  {
+    id: 'shmuel', name: 'Shmuel', prob: 34, color: '#4f87f5', volume: '$4,821',
+    data: [30, 32, 31, 33, 30, 31, 33, 35, 33, 34, 35, 33, 34],
+  },
+  {
+    id: 'jeremiah', name: 'Jeremiah', prob: 28, color: '#9b87f5', volume: '$3,924',
+    data: [26, 25, 27, 26, 28, 27, 26, 27, 29, 28, 27, 28, 28],
+  },
+  {
+    id: 'ezekiel', name: 'Ezekiel', prob: 26, color: '#f59e3a', volume: '$3,247',
+    data: [28, 27, 26, 27, 26, 28, 27, 25, 24, 26, 25, 27, 26],
+  },
+  {
+    id: 'zurishaddai', name: 'Zurishaddai', prob: 12, color: '#34d399', volume: '$855',
+    data: [16, 16, 16, 14, 16, 14, 14, 13, 14, 12, 13, 12, 12],
+  },
+];
+
+const labels = ['Apr 17','Apr 18','Apr 19','Apr 20','Apr 21','Apr 22','Apr 23','Apr 24','Apr 25','Apr 26','Apr 27','Apr 28','Apr 29'];
+
+// Main chart
+const ctx = document.getElementById('mainChart').getContext('2d');
+const mainChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: contracts.map(c => ({
+      label: c.name,
+      data: c.data,
+      borderColor: c.color,
+      backgroundColor: c.color + '14',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: false,
+      pointRadius: 0,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: c.color,
+      pointHoverBorderColor: '#0c0e14',
+      pointHoverBorderWidth: 2,
+    }))
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1e2c',
+        borderColor: '#2d3547',
+        borderWidth: 1,
+        titleColor: '#7b8caa',
+        bodyColor: '#dce4f0',
+        padding: 12,
+        displayColors: true,
+        boxWidth: 8, boxHeight: 8, boxPadding: 4,
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%` }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#1a1e2c', drawBorder: false },
+        ticks: { color: '#5a6785', font: { family: 'JetBrains Mono', size: 10 }, maxRotation: 0 },
+        border: { display: false },
+      },
+      y: {
+        min: 0, max: 50,
+        grid: { color: '#1a1e2c', drawBorder: false },
+        ticks: { color: '#5a6785', font: { family: 'JetBrains Mono', size: 10 }, callback: v => v + '%', stepSize: 10 },
+        border: { display: false },
+      }
+    }
+  }
+});
+
+// Contract cards + sparklines
+function renderContracts() {
+  const grid = document.getElementById('contractsGrid');
+  grid.innerHTML = '';
+  contracts.forEach(c => {
+    const change = c.data[c.data.length - 1] - c.data[0];
+    const changeStr = (change >= 0 ? '+' : '') + change + '%';
+    const changeColor = change >= 0 ? 'var(--green)' : 'var(--red)';
+    const card = document.createElement('div');
+    card.className = 'contract-card';
+    card.id = `card-${c.id}`;
+    card.innerHTML = `
+      <div class="contract-card-top">
+        <div>
+          <div class="contract-name">${c.name}</div>
+          <div style="font-size:11px;color:${changeColor};margin-top:2px;font-family:'JetBrains Mono',monospace;">${changeStr} since open</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="contract-prob">${c.prob}%</div>
+          <div class="contract-prob-label">probability</div>
+        </div>
+      </div>
+      <div class="prob-bar-track">
+        <div class="prob-bar-fill" style="width:${c.prob}%;background:${c.color};"></div>
+      </div>
+      <div class="contract-card-mid">
+        <div class="price-info">
+          <div class="price-item">
+            <div class="price-tag yes">YES</div>
+            <div class="price-cents" style="color:var(--green);">${c.prob}¢</div>
+          </div>
+          <div class="price-item">
+            <div class="price-tag no">NO</div>
+            <div class="price-cents" style="color:var(--red);">${100 - c.prob}¢</div>
+          </div>
+        </div>
+        <div class="sparkline-container">
+          <canvas id="spark-${c.id}" width="80" height="36"></canvas>
+        </div>
+      </div>
+      <div class="contract-card-bottom">
+        <div class="contract-volume">Vol <span>${c.volume}</span></div>
+        <div class="buy-btns">
+          <button class="buy-btn buy-yes" onclick="openOrder('${c.id}','yes')">Buy YES</button>
+          <button class="buy-btn buy-no" onclick="openOrder('${c.id}','no')">Buy NO</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  requestAnimationFrame(() => {
+    contracts.forEach(c => {
+      const canvas = document.getElementById(`spark-${c.id}`);
+      if (!canvas) return;
+      const change = c.data[c.data.length - 1] - c.data[0];
+      new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: c.data.map((_, i) => i),
+          datasets: [{ data: c.data, borderColor: change >= 0 ? '#00c07a' : '#f04f4f', borderWidth: 1.5, tension: 0.4, fill: false, pointRadius: 0 }]
+        },
+        options: {
+          responsive: false, animation: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } }
+        }
+      });
+    });
+  });
+}
+
+renderContracts();
+
+// Order panel
+let activeContract = null;
+let activeDirection = 'yes';
+
+function openOrder(contractId, direction) {
+  activeContract = contracts.find(c => c.id === contractId);
+  activeDirection = direction;
+  document.getElementById('orderPanelEmpty').classList.add('hidden');
+  document.getElementById('orderPanelForm').classList.remove('hidden');
+  document.getElementById('orderContractName').textContent = activeContract.name;
+  updateDirectionUI();
+  updatePayout();
+  document.querySelectorAll('.contract-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`card-${contractId}`).classList.add('selected');
+  document.getElementById('orderPanel').classList.add('mobile-open');
+}
+
+function setDirection(dir) {
+  activeDirection = dir;
+  updateDirectionUI();
+  updatePayout();
+}
+
+function updateDirectionUI() {
+  const price = activeDirection === 'yes' ? activeContract.prob : (100 - activeContract.prob);
+  document.getElementById('orderYesBtn').className = activeDirection === 'yes' ? 'order-type-btn yes-active' : 'order-type-btn inactive';
+  document.getElementById('orderNoBtn').className = activeDirection === 'no' ? 'order-type-btn no-active' : 'order-type-btn inactive';
+  const priceEl = document.getElementById('orderCurrentPrice');
+  priceEl.className = 'order-price-value ' + activeDirection;
+  priceEl.textContent = price + '¢';
+  const btn = document.getElementById('placeOrderBtn');
+  btn.className = `btn-place-order btn-place-${activeDirection}`;
+  btn.textContent = `Buy ${activeDirection.toUpperCase()} · ${activeContract.name}`;
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qtyInput');
+  input.value = Math.max(1, Math.min(10000, parseInt(input.value || 0) + delta));
+  updatePayout();
+}
+
+function updatePayout() {
+  if (!activeContract) return;
+  const qty = parseInt(document.getElementById('qtyInput').value) || 0;
+  const price = activeDirection === 'yes' ? activeContract.prob : (100 - activeContract.prob);
+  const cost = (qty * price / 100).toFixed(2);
+  const profit = (qty - qty * price / 100).toFixed(2);
+  const ret = price > 0 ? Math.round((100 - price) / price * 100) : 0;
+  document.getElementById('orderCost').textContent = '$' + cost;
+  document.getElementById('orderPayout').textContent = '$' + qty.toFixed(2);
+  document.getElementById('orderProfit').textContent = '+$' + profit;
+  document.getElementById('orderReturn').textContent = '+' + ret + '%';
+}
+
+document.getElementById('orderClose').addEventListener('click', () => {
+  document.getElementById('orderPanelForm').classList.add('hidden');
+  document.getElementById('orderPanelEmpty').classList.remove('hidden');
+  document.querySelectorAll('.contract-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('orderPanel').classList.remove('mobile-open');
+  activeContract = null;
+});
+
+function placeOrder() {
+  if (!activeContract) return;
+  const qty = document.getElementById('qtyInput').value;
+  showToast(`${activeDirection.toUpperCase()} order placed: ${qty} shares of <strong>${activeContract.name}</strong>`);
+}
+
+// Toast
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').innerHTML = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ['charts','orderbook','activity','rules'].forEach(name => {
+      document.getElementById(`tab-${name}`).classList.add('hidden');
+    });
+    document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
+  });
+});
+
+// Time range
+document.querySelectorAll('.time-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const range = btn.textContent;
+    const sliceStart = range === '1W' ? 6 : range === '3D' ? 10 : 0;
+    contracts.forEach((c, i) => { mainChart.data.datasets[i].data = c.data.slice(sliceStart); });
+    mainChart.data.labels = labels.slice(sliceStart);
+    mainChart.update();
+  });
+});
+
+// Activity feed
+const activityData = [
+  { dir:'yes', name:'Shmuel',       qty:200, price:'34¢', time:'2m ago' },
+  { dir:'no',  name:'Zurishaddai',  qty:150, price:'88¢', time:'5m ago' },
+  { dir:'yes', name:'Jeremiah',     qty:100, price:'28¢', time:'8m ago' },
+  { dir:'yes', name:'Ezekiel',      qty:300, price:'26¢', time:'12m ago' },
+  { dir:'no',  name:'Shmuel',       qty: 50, price:'66¢', time:'15m ago' },
+  { dir:'yes', name:'Shmuel',       qty:400, price:'33¢', time:'22m ago' },
+  { dir:'yes', name:'Jeremiah',     qty: 75, price:'27¢', time:'31m ago' },
+  { dir:'no',  name:'Ezekiel',      qty:180, price:'74¢', time:'45m ago' },
+  { dir:'yes', name:'Zurishaddai',  qty:500, price:'16¢', time:'1h ago'  },
+  { dir:'yes', name:'Shmuel',       qty:250, price:'31¢', time:'2h ago'  },
+  { dir:'yes', name:'Ezekiel',      qty:120, price:'28¢', time:'3h ago'  },
+  { dir:'no',  name:'Jeremiah',     qty: 90, price:'72¢', time:'4h ago'  },
+];
+const activityList = document.getElementById('activityList');
+activityData.forEach(a => {
+  const c = contracts.find(c => c.name === a.name);
+  const total = (a.qty * parseInt(a.price) / 100).toFixed(2);
+  const row = document.createElement('div');
+  row.className = 'activity-row';
+  row.innerHTML = `
+    <div class="activity-badge ${a.dir}">${a.dir.toUpperCase()}</div>
+    <div class="activity-name" style="color:${c?.color || 'var(--text)'};">${a.name}</div>
+    <div style="font-size:12px;color:var(--text-muted);">${a.qty} shares @ ${a.price}</div>
+    <div class="activity-amount">$${total}</div>
+    <div class="activity-time">${a.time}</div>
+  `;
+  activityList.appendChild(row);
+});
+</script>
+</body>
+</html>
